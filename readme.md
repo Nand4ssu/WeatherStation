@@ -1,8 +1,8 @@
-> **Vídeo de demonstração (não listado):** [assista aqui](COLE_AQUI_O_LINK_DO_YOUTUBE_OU_DO_DRIVE)
+> **Vídeo de demonstração:** [assista aqui](COLE_AQUI_O_LINK_DO_YOUTUBE_OU_DO_DRIVE)
 
 <div align="center">
 
-<img src="dashboard/SRC/logo.png" width="130" alt="Logo TechGirls Weather Station">
+<img src="ImagesREAD/imagens/dashboard-topo.jpg" width="130" alt="Logo TechGirls Weather Station">
 
 # TechGirls Weather Station
 
@@ -20,8 +20,6 @@ guarda os dados e mostra tudo num painel web com mapa, alertas e histórico.
 
 </div>
 
---
-
 ## Sobre o projeto
 
 ### O problema
@@ -34,7 +32,7 @@ Uma estação meteorológica **de baixo custo**, construída com componentes com
 
 ### Por que este projeto está no GitHub
 
-Este é um projeto acadêmico (disciplina **68F3 – Projeto e Desenvolvimento II**, Ciência da Computação), e escolhemos deixá-lo **aberto** para que:
+Este é um projeto acadêmico (disciplina **68F3 – Projeto e Desenvolvimento II**, Sistemas de Informação), e escolhemos deixá-lo **aberto** para que:
 
 - **outras pessoas aprendam** com ele: o código é comentado e organizado em módulos;
 - **outras pessoas reproduzam** a estação, em escolas, laboratórios, bairros ou cidades diferentes;
@@ -44,8 +42,6 @@ Este é um projeto acadêmico (disciplina **68F3 – Projeto e Desenvolvimento I
 ### Para quem é
 
 Estudantes e professores de eletrônica e programação, makers, escolas, grupos de pesquisa e quem quer acompanhar o clima do próprio bairro.
-
----
 
 ## Como funciona
 
@@ -67,23 +63,22 @@ flowchart LR
 ### O dashboard
 
 <p align="center">
-  <img src="docs/imagens/dashboard-topo.jpg" width="820" alt="Topo do dashboard, com a temperatura em destaque e os alertas">
+  <img src="ImagesREAD/imagens/dashboard-topo.jpg" width="820" alt="Topo do dashboard, com a temperatura em destaque e os alertas">
 </p>
 
 <p align="center">
-  <img src="docs/imagens/dashboard-boletim.jpg" width="640" alt="Boletim dos sensores">
+  <img src="ImagesREAD/imagens/dashboard-boletim.jpg" width="640" alt="Boletim dos sensores">
 </p>
 
 <p align="center">
-  <img src="docs/imagens/dashboard-mapa.jpg" width="640" alt="Mapa com a posição da estação">
+  <img src="ImagesREAD/imagens/dashboard-mapa.jpg" width="640" alt="Mapa com a posição da estação">
 </p>
 
 <p align="center">
-  <img src="docs/imagens/dashboard-historico.jpg" width="560" alt="Histórico salvo no banco, com média móvel">
-  <img src="docs/imagens/dashboard-celular.jpg" width="200" alt="Dashboard no celular">
+  <img src="ImagesREAD/imagens/dashboard-historico.jpg" width="560" alt="Histórico salvo no banco, com média móvel">
+  <img src="ImagesREAD/imagens/dashboard-celular.jpg" width="200" alt="Dashboard no celular">
 </p>
 
----
 
 ## Hardware
 
@@ -98,7 +93,7 @@ flowchart LR
 > Lógica em **3,3 V** (DHT22, BMP280, LDR) e **5 V** no pino VIN só para o aquecedor do MQ-135.
 > O AOUT do MQ-135 passa por um divisor de tensão (5 V → 3,33 V), abaixo do limite de 3,6 V do pino.
 
-**Fotos do protótipo:** [adicione as fotos em `docs/fotos/` e descomente as linhas abaixo]
+**Fotos do protótipo:** 
 
 <!--
 <p align="center">
@@ -258,35 +253,6 @@ erDiagram
 
 A pasta [`dashboard/`](dashboard) (HTML, CSS e JavaScript puro, sem bibliotecas) tem boletim ao vivo dos sensores, **alertas de condições extremas**, **mapa** com a posição da estação (projeção de Mercator), **histórico gravado no banco** com média móvel, modo escuro automático e layout responsivo.
 
----
-
-## Estrutura do repositório
-
-```text
-TechGirlsWeatherStation/
-├─ firmware/      programa do ESP32 (MicroPython)
-├─ backend/       API em Python, tratamento de dados e banco SQLite
-├─ dashboard/     site: index.html, CSS, JS e SRC
-├─ docs/          imagens, fotos e GIFs usados neste README
-├─ .vscode/       tarefas para ligar tudo com poucos cliques
-└─ README.md
-```
-
----
-
-## Testes
-
-> [!IMPORTANT]
-> Os casos CT01 a CT04 devem seguir o definido pela disciplina. A tabela abaixo é uma sugestão de organização.
-
-| Caso | O que valida | Evidência |
-|---|---|---|
-| CT01 | leitura dos sensores no Shell do Thonny | captura do terminal |
-| CT02 | publicação MQTT recebida pelo dashboard | captura do dashboard |
-| CT03 | gravação no banco e consulta, inclusive o descarte de outlier | saída do `consultar_banco.py` |
-| CT04 | alertas, mapa e histórico no dashboard | GIF ou captura |
-
----
 
 ## Limitações e próximos passos
 
@@ -295,16 +261,6 @@ TechGirlsWeatherStation/
 - O broker MQTT usado é público e não tem autenticação.
 - **Próximos passos:** placa de circuito impresso (PCB), invólucro com proteção IP65, alimentação solar e hospedagem da API.
 
----
-
-## Contribuindo
-
-Sugestões e melhorias são bem-vindas:
-
-1. Abra uma **issue** para relatar um problema ou propor uma ideia.
-2. Para mudar o código, faça um **fork**, crie uma branch, faça as alterações e abra um **pull request** explicando o que mudou.
-
----
 
 ## Equipe
 
@@ -312,10 +268,10 @@ Sugestões e melhorias são bem-vindas:
 
 | Nome | Função |
 |---|---|
-| [Nome 1] | [função] |
-| [Nome 2] | [função] |
-| [Nome 3] | [função] |
-| [Nome 4] | [função] |
+| Amanda Santos | [função] |
+| Camilla Sant'Anna | [função] |
+| Isabeli Vieira | [função] |
+| Anayza Rocha | [função] |
 
 ---
 
