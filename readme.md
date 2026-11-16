@@ -93,16 +93,7 @@ flowchart LR
 > Lógica em **3,3 V** (DHT22, BMP280, LDR) e **5 V** no pino VIN só para o aquecedor do MQ-135.
 > O AOUT do MQ-135 passa por um divisor de tensão (5 V → 3,33 V), abaixo do limite de 3,6 V do pino.
 
-**Fotos do protótipo:** 
 
-<!--
-<p align="center">
-  <img src="docs/fotos/protoboard.jpg" width="420" alt="Protótipo na protoboard">
-  <img src="docs/fotos/bancada.jpg" width="420" alt="Bancada de testes">
-</p>
--->
-
----
 
 ## Quer reproduzir? O que você vai precisar
 
