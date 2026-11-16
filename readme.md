@@ -63,6 +63,13 @@ flowchart LR
 ### O dashboard
 
 <p align="center">
+  <video src="ImagesREAD/imagens/WhatsApp Video 2026-11-16 at 20.50.53.mp4"
+         controls
+         width="820">
+  </video>
+</p>
+
+<p align="center">
   <img src="ImagesREAD/imagens/dashboard-topo.jpg" width="820" alt="Topo do dashboard, com a temperatura em destaque e os alertas">
 </p>
 
