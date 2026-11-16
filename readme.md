@@ -2,7 +2,7 @@
 
 <div align="center">
 
-<img src="ImagesREAD/imagens/dashboard-topo.jpg" width="130" alt="Logo TechGirls Weather Station">
+<img src="WeatherStation/SRC/favicon.png" width="130" alt="Logo TechGirls Weather Station">
 
 # TechGirls Weather Station
 
