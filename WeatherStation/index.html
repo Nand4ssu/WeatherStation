@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Estação Meteorológica ESP32 | TechGirls Weather Station</title>
+
+  <!-- Ícone da aba do navegador -->
+  <link rel="icon" type="image/png" href="SRC/favicon.png">
+
+  <!-- Toda a aparência está neste arquivo -->
+  <link rel="stylesheet" href="CSS/style.css">
+</head>
+<body>
+
+  <!-- ================= TOPO (faixa azul) ================= -->
+  <div class="hero">
+    <div class="pagina">
+
+      <!-- Logo, título e indicador de conexão -->
+      <header class="topo">
+        <div class="marca">
+          <!-- width e height evitam que a página "pule" enquanto a imagem carrega -->
+          <img class="logo" src="SRC/logo.png" width="112" height="112"
+               alt="Logo da TechGirls Weather Station">
+          <div class="marca-texto">
+            <h1>Estação Meteorológica ESP32</h1>
+            <p>Temperatura, umidade, pressão, luminosidade e qualidade do ar em tempo real</p>
+          </div>
+        </div>
+        <!-- aria-live: leitores de tela anunciam quando o estado muda -->
+        <div class="estado" aria-live="polite">
+          <span class="pilula" id="pilula" data-estado="conectando">Conectando</span>
+          <span id="ultima">Aguardando a primeira leitura</span>
+        </div>
+      </header>
+
+      <!-- Destaque: temperatura grande + gráfico de pressão (barógrafo) -->
+      <div class="agora">
+        <div class="leitura-principal">
+          <p class="rotulo">Temperatura agora</p>
+          <p class="temp-grande num"><span id="v-temp">--</span><small>°C</small></p>
+          <div class="linha-secundaria">
+            <span>Umidade <b class="num" id="v-umid">--</b> %</span>
+            <span>Pressão <b class="num" id="v-press">--</b> hPa</span>
+          </div>
+          <p class="resumo" id="resumo">Quando o ESP32 enviar a primeira leitura, o resumo das condições aparece aqui.</p>
+          <!-- Alertas de condições extremas (preenchido pelo JS/alertas.js) -->
+          <ul class="alertas" id="alertas" aria-live="polite"></ul>
+        </div>
+
+        <div class="barografo">
+          <h2>Barógrafo</h2>
+          <p id="tendencia">Pressão ao nível do mar, leitura a leitura</p>
+          <!-- O conteúdo do SVG é desenhado pelo js/graficos.js -->
+          <svg id="svg-barografo" role="img" aria-label="Gráfico da pressão atmosférica ao longo das leituras"></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pagina">
+    <main>
+
+      <!-- ================= BOLETIM: um cartão por sensor ================= -->
+      <section aria-labelledby="t-boletim">
+        <h2 id="t-boletim">Boletim dos sensores</h2>
+        <p class="ajuda">Valor atual de cada sensor, mini-gráfico das últimas leituras e o mínimo e o máximo do período.</p>
+        <!-- Os cartões são criados pelo js/app.js -->
+        <div class="cartoes" id="boletim"></div>
+      </section>
+
+      <!-- ================= MAPA: onde fica a estação (JS/mapa.js) ================= -->
+      <section aria-labelledby="t-mapa">
+        <h2 id="t-mapa">Localização da estação</h2>
+        <p class="ajuda">A posição vem das coordenadas geográficas (latitude e longitude) e é calculada com a projeção de Mercator, da Geometria Analítica. Os números ao lado mostram a conta.</p>
+        <div class="mapa-bloco">
+          <div class="mapa-caixa">
+            <div class="mapa-area" id="mapa-area" role="img" aria-label="Mapa com a localização da estação meteorológica"></div>
+            <div class="mapa-zoom">
+              <button class="botao secundario" type="button" id="mapa-menos" aria-label="Afastar o mapa">&minus;</button>
+              <button class="botao secundario" type="button" id="mapa-mais" aria-label="Aproximar o mapa">+</button>
+            </div>
+          </div>
+          <div class="mapa-painel">
+            <h3>Coordenadas e projeção</h3>
+            <dl id="mapa-dados"></dl>
+            <p class="formulas num">x = (λ + 180°) / 360° · 256 · 2<sup>z</sup><br>y = (1 − ln(tan φ + sec φ) / π) / 2 · 256 · 2<sup>z</sup></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= HISTÓRICO: gráfico grande com abas ================= -->
+      <section aria-labelledby="t-historico">
+        <h2 id="t-historico">Histórico</h2>
+        <p class="ajuda">Escolha a grandeza e passe o mouse (ou o dedo) sobre o gráfico para ver cada leitura.</p>
+        <div class="abas" role="tablist" id="abas"></div>
+        <div class="grafico">
+          <svg id="svg-historico" role="img" aria-label="Gráfico do histórico"></svg>
+          <!-- Caixinha que aparece ao passar o mouse sobre o gráfico -->
+          <div class="dica" id="dica" hidden></div>
+          <p class="legenda" id="legenda"></p>
+        </div>
+      </section>
+
+      <!-- ================= HISTÓRICO SALVO NO BANCO (JS/historico.js, via API) ================= -->
+      <section aria-labelledby="t-hist-banco">
+        <h2 id="t-hist-banco">Histórico salvo no banco de dados</h2>
+        <p class="ajuda">Leituras gravadas pela API em qualquer dia, mesmo quando o site estava fechado. A média móvel suaviza o gráfico.</p>
+        <div class="filtro-historico">
+          <label>Dia <input type="date" id="hd-dia"></label>
+          <label>Grandeza <select id="hd-grandeza"></select></label>
+          <label>Média móvel
+            <select id="hd-media">
+              <option value="0">Sem média móvel</option>
+              <option value="3">3 leituras</option>
+              <option value="5">5 leituras</option>
+              <option value="10">10 leituras</option>
+            </select>
+          </label>
+          <button class="botao" type="button" id="hd-carregar">Carregar</button>
+        </div>
+        <p id="hd-msg" class="msg-historico" role="status"></p>
+        <div class="resumo-dia" id="hd-resumo"></div>
+        <div class="grafico">
+          <svg id="hd-svg" role="img" aria-label="Gráfico do histórico gravado no banco"></svg>
+          <div class="dica" id="hd-dica" hidden></div>
+          <p class="legenda" id="hd-legenda"></p>
+        </div>
+      </section>
+
+      <!-- ================= TABELA: últimas 10 leituras ================= -->
+      <section aria-labelledby="t-tabela">
+        <h2 id="t-tabela">Últimas leituras</h2>
+        <div class="tabela-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Horário</th><th scope="col">Temp. (°C)</th><th scope="col">Umidade (%)</th>
+                <th scope="col">Pressão (hPa)</th><th scope="col">Luz</th><th scope="col">CO₂ (ppm)</th>
+                <th scope="col">Gás</th><th scope="col" id="th-chuva">Chuva (mm/h)</th>
+              </tr>
+            </thead>
+            <tbody id="tabela"></tbody>
+          </table>
+          <p class="vazio" id="tabela-vazia">Nenhuma leitura recebida ainda. Ligue o ESP32 ou use os dados de demonstração.</p>
+        </div>
+      </section>
+
+      <!-- ================= CONEXÃO: broker, tópico e botões ================= -->
+      <section aria-labelledby="t-conexao">
+        <h2 id="t-conexao">Conexão com o ESP32</h2>
+        <p class="ajuda">O ESP32 publica as leituras em um broker MQTT, e esta página assina o mesmo tópico pela internet. Os campos já vêm com os valores do código da estação.</p>
+        <div class="conexao">
+          <form class="campos" id="form-conexao">
+            <label>Endereço do broker (WebSocket seguro)
+              <input type="text" id="campo-broker" autocomplete="off" spellcheck="false">
+            </label>
+            <label>Tópico
+              <input type="text" id="campo-topico" autocomplete="off" spellcheck="false">
+            </label>
+            <div class="botoes">
+              <button class="botao" type="submit">Conectar</button>
+              <button class="botao secundario" type="button" id="btn-desconectar">Desconectar</button>
+              <button class="botao secundario" type="button" id="btn-demo">Usar dados de demonstração</button>
+            </div>
+            <p id="mensagem" role="status"></p>
+          </form>
+
+          <div class="como">
+            <strong>Como funciona</strong>
+            <ol>
+              <li>O ESP32 lê os sensores e publica um JSON no tópico a cada intervalo.</li>
+              <li>O broker repassa a mensagem para quem assina o tópico.</li>
+              <li>Esta página assina o tópico e atualiza valores, gráficos e tabela.</li>
+            </ol>
+            <p>Se a página e o ESP32 usarem o mesmo broker e o mesmo tópico, os dados chegam sozinhos. O histórico fica só nesta aba: ao recarregar, ele recomeça.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= SOBRE: sensores usados ================= -->
+      <section aria-labelledby="t-sobre">
+        <h2 id="t-sobre">Sobre a estação</h2>
+        <div class="sobre">
+          <div><h3>DHT22</h3><p>Temperatura e umidade relativa do ar. Pino GPIO 15.</p></div>
+          <div><h3>BMP280</h3><p>Pressão atmosférica, também convertida para o nível do mar. I²C no endereço 0x76 (SDA no GPIO 21, SCL no GPIO 22).</p></div>
+          <div><h3>Módulo LDR</h3><p>Informa se o ambiente está claro ou escuro, pela saída digital. Pino GPIO 32.</p></div>
+          <div><h3>MQ-135</h3><p>Estimativa de CO₂ em ppm, corrigida por temperatura e umidade (saída analógica no GPIO 34), e alerta de gás pela saída digital (GPIO 23).</p></div>
+          <div id="sobre-chuva"><h3>Pluviômetro de báscula (opcional)</h3><p>Chuva por contagem de basculadas (0,2789 mm cada), com interrupção externa e debounce de 100 ms. Pino GPIO 13.</p></div>
+          <div><h3>ESP32 com MicroPython</h3><p>Envia as leituras em JSON por Wi-Fi, usando MQTT.</p></div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Rodapé: logo pequeno, nome da equipe e direitos autorais -->
+    <footer>
+      <div class="rodape-marca">
+        <img class="logo-rodape" src="SRC/logo.png" width="48" height="48" alt="">
+        <p><strong>TechGirls Weather Station</strong><br>
+           Projeto de estação meteorológica com ESP32 e MicroPython. Os valores de CO₂ são estimativas do MQ-135 e servem como referência.</p>
+      </div>
+      <p class="direitos">&copy; <span id="ano">2026</span> Equipe TechGirls. Todos os direitos reservados.</p>
+    </footer>
+  </div>
+
+  <!--
+    Scripts: a ORDEM importa. Cada arquivo usa o que o anterior criou.
+    A pasta se chama JS (maiúsculo): o nome aqui precisa ser idêntico,
+    senão o site funciona no Windows mas quebra quando é publicado na internet.
+  -->
+  <script src="JS/config.js"></script>
+  <script src="JS/utils.js"></script>
+  <script src="JS/mqtt.js"></script>
+  <script src="JS/graficos.js"></script>
+  <script src="JS/demo.js"></script>
+  <script src="JS/alertas.js"></script>
+  <script src="JS/mapa.js"></script>
+  <script src="JS/historico.js"></script>
+  <script src="JS/app.js"></script>
+  <script>document.getElementById("ano").textContent = new Date().getFullYear();</script>
+</body>
+</html>

@@ -1,0 +1,439 @@
+/* ==========================================================
+   ESTAÇÃO METEOROLÓGICA ESP32 - ESTILO (tema azul, delicado e elegante)
+   ----------------------------------------------------------
+   Princípios: superfícies planas, linhas finas de 1px,
+   tipografia leve e bastante espaço em branco.
+
+   Índice:
+     0. Fontes (arquivos na pasta SRC/fonts/)
+     1. Variáveis de cor e fonte (modo claro e escuro)
+     2. Base (reset, tipografia, foco)
+     3. Topo (logo + título + temperatura + barógrafo)
+     4. Seções e cartões do boletim
+     5. Histórico (abas, gráfico, tooltip)
+     6. Tabela
+     7. Conexão (formulário)
+     8. Sobre e rodapé
+     9. Elementos dos gráficos SVG
+    10. Responsivo e acessibilidade
+   ========================================================== */
+
+/* ---------- 0. FONTES ----------
+   As fontes estão na pasta SRC/fonts/, então o site funciona até sem internet.
+     Cormorant Garamond -> títulos (serifa fina, delicada e elegante)
+     Arial            -> todos os números (fonte do sistema, não precisa de arquivo)
+     Nunito           -> textos, tabela e números pequenos (letras arredondadas)
+   Para trocar de fonte, mude só as variáveis --fonte-* na seção 1. */
+@font-face { font-family: "Nunito"; font-weight: 300; font-style: normal; font-display: swap; src: url("../SRC/fonts/nunito-latin-300-normal.woff2") format("woff2"); }
+@font-face { font-family: "Nunito"; font-weight: 400; font-style: normal; font-display: swap; src: url("../SRC/fonts/nunito-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Nunito"; font-weight: 600; font-style: normal; font-display: swap; src: url("../SRC/fonts/nunito-latin-600-normal.woff2") format("woff2"); }
+@font-face { font-family: "Nunito"; font-weight: 700; font-style: normal; font-display: swap; src: url("../SRC/fonts/nunito-latin-700-normal.woff2") format("woff2"); }
+@font-face { font-family: "Cormorant Garamond"; font-weight: 600; font-style: normal; font-display: swap; src: url("../SRC/fonts/cormorant-garamond-latin-600-normal.woff2") format("woff2"); }
+@font-face { font-family: "Cormorant Garamond"; font-weight: 700; font-style: normal; font-display: swap; src: url("../SRC/fonts/cormorant-garamond-latin-700-normal.woff2") format("woff2"); }
+
+
+/* ---------- 1. VARIÁVEIS ----------
+   Mudar uma cor aqui muda o site inteiro.
+   "papel" = fundo da página, "superficie" = fundo dos cartões,
+   "tinta" = cor do texto. */
+:root {
+  color-scheme: light;
+
+  /* Fundo e superfícies */
+  --papel: #F5F9FC;            /* fundo da página: quase branco azulado */
+  --superficie: #FFFFFF;       /* cartões */
+  --superficie-2: #F0F6FB;     /* cabeçalho de tabela, campos */
+
+  /* Texto */
+  --tinta: #1D3550;            /* texto principal: azul-acinzentado escuro */
+  --tinta-suave: #6B8299;      /* texto secundário */
+
+  /* Linhas finas */
+  --grade: #E3ECF4;
+  --grade-forte: #CBDAE8;
+
+  /* Cores dos sensores (tons de azul, um pouco dessaturados) */
+  --c-temperatura: #3F7FBF;
+  --c-umidade: #5BA7D0;
+  --c-pressao: #6677B8;
+  --c-luz: #7DBCE6;
+  --c-ar: #4A9AAE;
+  --c-chuva: #4F8FD6;
+
+  --acento: #3F7FBF;           /* botões e links */
+  --foco: #5BA7D0;
+
+  /* Status (reservadas para qualidade do ar e conexão) */
+  --ok: #3F8F67;
+  --alerta: #B0812F;
+  --ruim: #B8574F;
+
+  /* Arredondamentos:
+     --raio-dados: quadros que recebem as informações do ESP32
+                   (cartões, gráficos, tabela). Aumente para arredondar mais.
+     --raio: campos de texto e botões (mais discreto). */
+  --raio-dados: 24px;
+  --raio-dica: 12px;           /* caixinha que segue o mouse no gráfico */
+  --raio: 10px;
+
+  /* Fontes: troque aqui para mudar o estilo do site inteiro */
+  --fonte-titulo: "Cormorant Garamond", Georgia, "Times New Roman", serif;     /* títulos (serifa fina e delicada) */
+  --fonte-numeros: Arial, "Helvetica Neue", Helvetica, sans-serif;             /* todos os números */
+  --fonte-texto: "Nunito", "Segoe UI", "Helvetica Neue", Arial, system-ui, sans-serif;  /* textos e números pequenos */
+  --num: var(--fonte-numeros); /* os números da tabela, tooltips e rótulos usam a mesma fonte */
+  --texto: var(--fonte-texto);
+
+  /* Acabamento: fundo do topo em degradê suave e sombras leves */
+  --hero-fundo: linear-gradient(180deg, #E3EFFB 0%, #F0F6FB 70%, #F5F9FC 100%);
+  --sombra: 0 10px 30px -16px rgba(63, 127, 191, .38);
+  --sombra-forte: 0 16px 36px -16px rgba(63, 127, 191, .5);
+  --destaque-numero: linear-gradient(135deg, #2F6FB5 0%, #5BA7D0 100%);
+}
+
+/* Modo escuro: ativado automaticamente se o sistema estiver escuro */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --papel: #0C1722;
+    --superficie: #112131;
+    --superficie-2: #152A3E;
+    --tinta: #DCE8F2;
+    --tinta-suave: #8CA5BB;
+    --grade: #1B3045;
+    --grade-forte: #2A4560;
+
+    --c-temperatura: #6AA6E2;
+    --c-umidade: #6EC0E6;
+    --c-pressao: #97A6E6;
+    --c-luz: #93CDF0;
+    --c-ar: #6CC3D4;
+    --c-chuva: #78AEEA;
+
+    --acento: #6AA6E2;
+    --foco: #93CDF0;
+    --ok: #6CC49A;
+    --alerta: #D8AD5E;
+    --ruim: #E57F76;
+
+    --hero-fundo: linear-gradient(180deg, #102236 0%, #0F1E2F 70%, #0C1722 100%);
+    --sombra: 0 10px 30px -16px rgba(0, 0, 0, .6);
+    --sombra-forte: 0 16px 36px -16px rgba(0, 0, 0, .75);
+    --destaque-numero: linear-gradient(135deg, #8EC3FF 0%, #6EC0E6 100%);
+  }
+}
+
+
+/* ---------- 2. BASE ---------- */
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--papel);
+  color: var(--tinta);
+  font: 400 16px/1.65 var(--texto);
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--acento); }
+
+/* Contorno visível ao navegar pelo teclado (acessibilidade) */
+:focus-visible { outline: 2px solid var(--foco); outline-offset: 2px; border-radius: 4px; }
+
+/* Números com largura fixa: não "pulam" quando o valor muda */
+.num { font-family: var(--num); font-variant-numeric: tabular-nums; }
+
+/* Centraliza o conteúdo e limita a largura */
+.pagina { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+
+
+/* ---------- 3. TOPO ---------- */
+/* Fundo azul bem claro e plano, separado do resto por uma linha fina */
+.hero {
+  background: var(--hero-fundo);
+  border-bottom: 1px solid var(--grade-forte);
+  padding-bottom: 44px;
+}
+
+header.topo {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  gap: 16px; padding: 24px 0 8px;
+}
+
+/* Marca: logo redondo ao lado do título */
+.marca { display: flex; align-items: center; gap: 18px; }
+.logo {
+  width: 112px; height: 112px; flex: none; display: block;
+  object-fit: cover;                        /* nunca estica a imagem: recorta o centro, se precisar */
+  border-radius: 50%;                       /* o logo é um círculo */
+  box-shadow: 0 0 0 1px var(--grade-forte); /* fio fino ao redor, para destacar do fundo */
+}
+.marca h1 { margin: 0; font: 700 2.4rem/1.1 var(--fonte-titulo); letter-spacing: .005em; }
+.marca p { margin: 4px 0 0; color: var(--tinta-suave); font-size: .95rem; }
+
+.estado { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; font-size: .85rem; color: var(--tinta-suave); }
+
+/* Indicador de conexão: ponto + texto, sem caixa pesada */
+.pilula {
+  display: inline-flex; align-items: center; gap: 8px; padding: 3px 12px 3px 10px;
+  background: var(--superficie); border: 1px solid var(--grade-forte);
+  border-radius: 999px; font-weight: 500; color: var(--tinta);
+}
+.pilula::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--cor-estado, var(--tinta-suave)); }
+.pilula[data-estado="conectado"]    { --cor-estado: var(--ok); }
+.pilula[data-estado="conectando"]   { --cor-estado: var(--alerta); }
+.pilula[data-estado="demo"]         { --cor-estado: var(--acento); }
+.pilula[data-estado="desconectado"] { --cor-estado: var(--ruim); }
+
+/* Destaque: temperatura (esquerda) + barógrafo (direita) */
+.agora {
+  display: grid; grid-template-columns: minmax(260px, 5fr) 7fr; gap: 48px;
+  align-items: center; padding-top: 28px;
+}
+.leitura-principal .rotulo { color: var(--tinta-suave); font-size: .9rem; margin: 0 0 2px; }
+.temp-grande {
+  margin: 0; font: 400 clamp(4.4rem, 11vw, 7rem)/1.05 var(--fonte-numeros);
+  letter-spacing: -0.02em; color: var(--c-temperatura);
+  /* número com degradê suave; se o navegador não suportar, usa a cor sólida */
+  background: var(--destaque-numero); -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.temp-grande small { font: 400 .3em var(--fonte-numeros); margin-left: 6px; vertical-align: top; position: relative; top: .7em; -webkit-text-fill-color: var(--tinta-suave); color: var(--tinta-suave); }
+.linha-secundaria { display: flex; flex-wrap: wrap; gap: 4px 28px; margin-top: 14px; font-size: .95rem; color: var(--tinta-suave); }
+.linha-secundaria b { font: 400 1.3rem var(--num); color: var(--tinta); }
+.resumo { margin: 18px 0 0; color: var(--tinta-suave); max-width: 44ch; font-size: .95rem; }
+
+/* Gráfico de pressão: cartão branco bem arredondado, com borda fina */
+.barografo {
+  background: var(--superficie); border: 1px solid var(--grade-forte);
+  border-radius: var(--raio-dados); padding: 22px 28px 16px;
+  display: flex; flex-direction: column; box-shadow: var(--sombra);
+}
+.barografo h2 { margin: 0; font: 700 1.5rem/1.2 var(--fonte-titulo); }
+.barografo p { margin: 0 0 8px; color: var(--tinta-suave); font-size: .82rem; }
+.barografo svg { width: 100%; height: 190px; display: block; }
+
+
+/* ---------- 4. SEÇÕES E CARTÕES DO BOLETIM ---------- */
+main { padding-top: 8px; }
+section { margin-top: 56px; }
+section > h2 { font: 700 2.15rem/1.2 var(--fonte-titulo); margin: 0 0 6px; }
+/* Fio decorativo curto sob cada título de seção */
+section > h2::after { content: ""; display: block; width: 44px; height: 3px; margin-top: 8px; border-radius: 3px; background: linear-gradient(90deg, var(--acento), var(--c-umidade)); }
+section > p.ajuda { margin: 10px 0 20px; color: var(--tinta-suave); font-size: .9rem; max-width: 70ch; }
+
+/* Grade de cartões: quantos couberem por linha */
+.cartoes { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
+
+.cartao {
+  background: var(--superficie); border: 1px solid var(--grade); border-radius: var(--raio-dados);
+  padding: 22px 26px 18px; display: flex; flex-direction: column; gap: 4px;
+  box-shadow: var(--sombra); transition: transform .2s, box-shadow .2s;
+}
+.cartao:hover { transform: translateY(-3px); box-shadow: var(--sombra-forte); }
+/* Pontinho colorido ao lado do nome identifica o sensor */
+.cartao .nome { font-weight: 700; font-size: .98rem; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.cartao .nome::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--cor-sensor, var(--acento)); flex: none; align-self: center; }
+.cartao .nome span { font-weight: 400; color: var(--tinta-suave); font-size: .8rem; }
+.cartao .valor { font: 400 2.3rem/1.2 var(--fonte-numeros); }
+.cartao .valor small { font: 400 .42em var(--fonte-numeros); color: var(--tinta-suave); margin-left: 5px; }
+.cartao svg { width: 100%; height: 44px; display: block; margin: 4px 0; }
+.cartao .faixa { color: var(--tinta-suave); font-size: .8rem; }
+
+/* Selo de qualidade do ar (Boa / Moderada / Ruim) */
+.selo {
+  display: inline-block; margin-left: 10px; padding: 0 9px; border-radius: 999px;
+  font: 700 .75rem var(--texto); vertical-align: middle; border: 1px solid currentColor;
+}
+.selo.boa { color: var(--ok); } .selo.moderada { color: var(--alerta); } .selo.ruim { color: var(--ruim); }
+
+
+/* ---------- 5. HISTÓRICO ---------- */
+/* Abas em formato de pílula; a selecionada fica preenchida com degradê azul */
+.abas { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.abas button {
+  font: 600 .9rem var(--texto); color: var(--tinta-suave); background: transparent;
+  border: 1px solid var(--grade-forte); border-radius: 999px;
+  padding: 7px 18px; cursor: pointer; transition: color .15s, background .15s, border-color .15s;
+}
+.abas button:hover { color: var(--tinta); border-color: var(--acento); }
+.abas button[aria-selected="true"] { color: #fff; background: linear-gradient(135deg, var(--acento), var(--c-umidade)); border-color: transparent; }
+
+.grafico { position: relative; background: var(--superficie); border: 1px solid var(--grade); border-radius: var(--raio-dados); padding: 24px 28px 18px; box-shadow: var(--sombra); }
+.grafico svg { width: 100%; height: 300px; display: block; touch-action: pan-y; }
+.legenda { margin: 10px 0 0; font-size: .82rem; color: var(--tinta-suave); }
+
+/* Caixinha que segue o mouse no gráfico */
+.dica {
+  position: absolute; pointer-events: none; z-index: 2;
+  background: var(--superficie); color: var(--tinta); border: 1px solid var(--grade-forte);
+  padding: 6px 12px; border-radius: var(--raio-dica);
+  font: 700 .85rem var(--num); white-space: nowrap; box-shadow: var(--sombra);
+  transform: translate(-50%, -125%);
+}
+.dica span { display: block; font-weight: 600; color: var(--tinta-suave); font-size: .75rem; }
+
+
+/* ---------- 6. TABELA ---------- */
+/* overflow recorta os cantos da tabela de acordo com o arredondamento */
+.tabela-wrap { overflow-x: auto; background: var(--superficie); border: 1px solid var(--grade); border-radius: var(--raio-dados); box-shadow: var(--sombra); }
+table { border-collapse: collapse; width: 100%; font-size: .88rem; }
+th, td { padding: 11px 16px; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--grade); }
+/* Mais espaço nas pontas, para o texto não encostar nos cantos arredondados */
+th:first-child, td:first-child { text-align: left; padding-left: 26px; }
+th:last-child, td:last-child { padding-right: 26px; }
+th { font: 700 .78rem var(--texto); color: var(--tinta-suave); background: var(--superficie-2); letter-spacing: .02em; }
+td { font-family: var(--num); font-variant-numeric: tabular-nums; }
+tbody tr:hover { background: var(--superficie-2); }
+tbody tr:last-child td { border-bottom: 0; }
+.vazio { padding: 18px 26px; color: var(--tinta-suave); margin: 0; font-size: .9rem; }
+
+
+/* ---------- 7. CONEXÃO ---------- */
+.conexao { display: grid; grid-template-columns: 3fr 2fr; gap: 32px; }
+form.campos { background: var(--superficie); border: 1px solid var(--grade); border-radius: var(--raio-dados); padding: 24px; display: grid; gap: 14px; box-shadow: var(--sombra); }
+label { display: grid; gap: 5px; font-size: .85rem; font-weight: 700; color: var(--tinta-suave); }
+input[type="text"] {
+  font: 400 .95rem var(--texto); color: var(--tinta); background: var(--superficie);
+  border: 1px solid var(--grade-forte); border-radius: 12px; padding: 10px 14px; width: 100%;
+}
+input[type="text"]:focus { border-color: var(--acento); outline: none; box-shadow: 0 0 0 3px color-mix(in srgb, var(--foco) 25%, transparent); }
+.botoes { display: flex; flex-wrap: wrap; gap: 8px; }
+.botao {
+  font: 700 .88rem var(--texto); padding: 9px 20px; border-radius: 999px; cursor: pointer;
+  border: 1px solid transparent; background: linear-gradient(135deg, var(--acento), var(--c-umidade)); color: #fff;
+  transition: filter .15s, border-color .15s;
+}
+.botao:hover { filter: brightness(1.08); }
+.botao.secundario { background: transparent; color: var(--acento); border-color: var(--grade-forte); }
+.botao.secundario:hover { border-color: var(--acento); filter: none; }
+.como { font-size: .9rem; color: var(--tinta-suave); }
+.como strong { color: var(--tinta); font: 700 1.45rem var(--fonte-titulo); }
+.como ol { margin: 6px 0 0; padding-left: 20px; }
+.como li { margin-bottom: 4px; }
+#mensagem { min-height: 1.5em; font-size: .85rem; color: var(--tinta-suave); margin: 0; }
+
+
+/* ---------- 8. SOBRE E RODAPÉ ---------- */
+/* Lista simples separada por linhas finas, sem caixas */
+.sobre { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0 40px; }
+.sobre div { padding: 16px 0; border-top: 1px solid var(--grade); }
+.sobre h3 { margin: 0 0 2px; font: 700 1.5rem/1.2 var(--fonte-titulo); color: var(--acento); }
+.sobre p { margin: 0; font-size: .88rem; color: var(--tinta-suave); }
+
+/* Rodapé: logo pequeno + nome da equipe e aviso */
+footer {
+  margin-top: 56px; padding: 22px 0 28px; border-top: 1px solid var(--grade);
+  color: var(--tinta-suave); font-size: .8rem;
+}
+.rodape-marca { display: flex; align-items: center; gap: 16px; }
+.rodape-marca p { margin: 0; }
+/* Linha de direitos autorais, no final da página */
+.direitos {
+  margin: 22px 0 0; padding-top: 16px; border-top: 1px solid var(--grade);
+  text-align: center; font-size: .82rem; letter-spacing: .02em;
+}
+footer strong { color: var(--tinta); font: 700 1.3rem var(--fonte-titulo); }
+.logo-rodape { width: 48px; height: 48px; flex: none; object-fit: cover; border-radius: 50%; box-shadow: 0 0 0 1px var(--grade-forte); }
+
+
+/* ---------- 9. ELEMENTOS DOS GRÁFICOS SVG ----------
+   O js/graficos.js cria elementos com estas classes. */
+.linha-grade { stroke: var(--grade); stroke-width: 1; }
+.linha-grade.forte { stroke: var(--grade-forte); stroke-opacity: .6; }
+.rotulo-eixo { fill: var(--tinta-suave); font: 11px var(--fonte-numeros); }
+.traco { fill: none; stroke-width: 1.8; stroke-linejoin: round; stroke-linecap: round; }
+.mira { stroke: var(--tinta-suave); stroke-width: 1; stroke-dasharray: 3 3; stroke-opacity: .6; }   /* linha vertical do mouse */
+.ponto-mira { stroke: var(--superficie); stroke-width: 2; }                                         /* bolinha do ponto */
+
+
+/* ---------- 9b. NÚMEROS ALINHADOS NOS TÍTULOS ----------
+   A Cormorant usa números "caídos" por padrão (ex.: ESP32 com o 3 abaixo da linha).
+   Esta regra os deixa alinhados. Precisa vir DEPOIS dos títulos, porque o atalho "font:" a zera. */
+.marca h1, section > h2, .barografo h2, .sobre h3, .como strong, footer strong { font-feature-settings: "lnum" 1; }
+
+
+/* ---------- 9c. ALERTAS DE CONDIÇÕES EXTREMAS ---------- */
+.alertas { list-style: none; margin: 18px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; max-width: 46ch; }
+.alerta {
+  --c: var(--ruim);                       /* cor do aviso: vermelho = alerta forte */
+  display: flex; align-items: center; gap: 10px; padding: 8px 16px 8px 10px;
+  color: var(--c); background: var(--superficie); border: 1px solid var(--c);
+  border-radius: 999px; font: 700 .88rem var(--texto);
+}
+.alerta.atencao { --c: var(--alerta); }   /* amarelo = atenção */
+.alerta.ok { --c: var(--ok); font-weight: 600; }
+.alerta-icone {
+  width: 22px; height: 22px; flex: none; display: grid; place-items: center;
+  border-radius: 50%; background: var(--c); color: var(--superficie); font-size: .78rem; font-weight: 800;
+}
+
+
+/* ---------- 9d. MAPA DA ESTAÇÃO ---------- */
+.mapa-bloco { display: grid; grid-template-columns: 3fr 2fr; gap: 24px; align-items: start; }
+.mapa-caixa { position: relative; }
+.mapa-area {
+  position: relative; height: 340px; overflow: hidden; background: var(--superficie-2);
+  border: 1px solid var(--grade); border-radius: var(--raio-dados); box-shadow: var(--sombra);
+}
+.mapa-ladrilhos { position: absolute; inset: 0; }
+.mapa-ladrilhos img { position: absolute; display: block; max-width: none; }
+.mapa-grade { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.mapa-linha { stroke: rgba(13, 71, 161, .35); stroke-width: 1; stroke-dasharray: 3 4; }
+.mapa-rotulo { font: 600 10px var(--fonte-numeros); fill: #0B2A4A; paint-order: stroke; stroke: rgba(255, 255, 255, .9); stroke-width: 3px; }
+.mapa-rotulo.forte { font-size: 11px; font-weight: 700; }
+.mapa-regua { stroke: #0B2A4A; stroke-width: 3; stroke-linecap: round; }
+.mapa-halo { fill: rgba(63, 127, 191, .22); }
+.mapa-gota { fill: var(--acento); stroke: #fff; stroke-width: 2; }
+.mapa-furo { fill: #fff; }
+.mapa-pino.secundario .mapa-gota { fill: var(--c-pressao); }
+.mapa-nome { font: 700 12px var(--texto); fill: #0B2A4A; paint-order: stroke; stroke: #fff; stroke-width: 3.5px; }
+.mapa-credito { position: absolute; left: 10px; bottom: 8px; padding: 1px 8px; font-size: .68rem; background: rgba(255, 255, 255, .85); color: #0B2A4A; border-radius: 8px; }
+.mapa-credito a { color: inherit; }
+.mapa-zoom { position: absolute; right: 12px; top: 12px; display: flex; flex-direction: column; gap: 6px; }
+.mapa-zoom .botao { width: 36px; height: 36px; padding: 0; border-radius: 50%; background: var(--superficie); font-size: 1.2rem; line-height: 1; }
+.mapa-painel { background: var(--superficie); border: 1px solid var(--grade); border-radius: var(--raio-dados); padding: 22px 26px; box-shadow: var(--sombra); }
+.mapa-painel h3 { margin: 0 0 8px; font: 700 1.5rem/1.2 var(--fonte-titulo); }
+.mapa-painel dl { margin: 0; }
+.mapa-painel dl > div { display: flex; justify-content: space-between; gap: 14px; padding: 7px 0; border-bottom: 1px solid var(--grade); }
+.mapa-painel dt { color: var(--tinta-suave); font-size: .84rem; }
+.mapa-painel dd { margin: 0; font-size: .88rem; text-align: right; }
+.formulas { margin: 14px 0 0; color: var(--tinta-suave); font-size: .8rem; line-height: 1.8; }
+
+
+/* ---------- 9e. HISTÓRICO SALVO NO BANCO ---------- */
+.filtro-historico { display: flex; flex-wrap: wrap; align-items: end; gap: 14px; margin-bottom: 12px; }
+input[type="date"], select {
+  font: 400 .95rem var(--texto); color: var(--tinta); background: var(--superficie);
+  border: 1px solid var(--grade-forte); border-radius: 12px; padding: 10px 14px;
+}
+input[type="date"]:focus, select:focus { border-color: var(--acento); outline: none; box-shadow: 0 0 0 3px color-mix(in srgb, var(--foco) 25%, transparent); }
+.msg-historico { min-height: 1.5em; margin: 0 0 12px; color: var(--tinta-suave); font-size: .88rem; }
+.resumo-dia { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 14px; }
+.mini-cartao {
+  display: flex; flex-direction: column; gap: 2px; padding: 12px 16px; background: var(--superficie);
+  border: 1px solid var(--grade); border-radius: 18px; box-shadow: var(--sombra);
+}
+.mini-cartao span { color: var(--tinta-suave); font-size: .78rem; }
+.mini-cartao b { font: 400 1.2rem var(--fonte-numeros); }
+
+
+/* ---------- 10. RESPONSIVO E ACESSIBILIDADE ---------- */
+/* Telas pequenas (celular): uma coluna só */
+@media (max-width: 820px) {
+  .agora, .conexao, .mapa-bloco { grid-template-columns: 1fr; gap: 28px; }
+  section { margin-top: 44px; }
+}
+/* Celular: logo um pouco menor e cartões com curvas proporcionais */
+@media (max-width: 560px) {
+  :root { --raio-dados: 20px; }
+  .logo { width: 84px; height: 84px; }
+  .marca { gap: 14px; }
+  .marca h1 { font-size: 1.65rem; }
+  section > h2 { font-size: 1.9rem; }
+  .barografo, .cartao, .grafico { padding-left: 20px; padding-right: 20px; }
+  .mapa-area { height: 300px; }
+  .mapa-painel { padding-left: 20px; padding-right: 20px; }
+  th:first-child, td:first-child { padding-left: 20px; }
+  th:last-child, td:last-child { padding-right: 20px; }
+}
+/* Quem pede menos animação no sistema não vê transições */
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
