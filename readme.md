@@ -60,32 +60,13 @@ flowchart LR
 2. O **backend em Python** recebe a mensagem, descarta valores impossíveis ou fora da curva e grava no banco.
 3. O **dashboard** mostra os valores ao vivo, o histórico, os alertas e a localização da estação.
 
-### O dashboard
+### O DashBoard
 
 <p align="center">
-  <video controls width="820">
-    <source src="ImagesREAD/imagens/demonstracao-weather-station.mp4"
-            type="video/mp4">
-    Seu navegador não suporta vídeos.
-  </video>
+  <img src="ImagesREAD/imagens/fullsite.jpeg" width="820" alt="Site inteiro como se encontra.">
 </p>
 
-<p align="center">
-  <img src="ImagesREAD/imagens/dashboard-topo.jpg" width="820" alt="Topo do dashboard, com a temperatura em destaque e os alertas">
-</p>
 
-<p align="center">
-  <img src="ImagesREAD/imagens/dashboard-boletim.jpg" width="640" alt="Boletim dos sensores">
-</p>
-
-<p align="center">
-  <img src="ImagesREAD/imagens/dashboard-mapa.jpg" width="640" alt="Mapa com a posição da estação">
-</p>
-
-<p align="center">
-  <img src="ImagesREAD/imagens/dashboard-historico.jpg" width="560" alt="Histórico salvo no banco, com média móvel">
-  <img src="ImagesREAD/imagens/dashboard-celular.jpg" width="200" alt="Dashboard no celular">
-</p>
 
 
 ## Hardware
