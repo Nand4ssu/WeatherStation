@@ -253,15 +253,6 @@ A pasta [`dashboard/`](dashboard) (HTML, CSS e JavaScript puro, sem bibliotecas)
 
 ---
 
-## Referências
-
-[Liste em ABNT: datasheets (DHT22, BMP280, MQ-135), documentação do MicroPython, do Flask e do protocolo MQTT, e a bibliografia usada no projeto.]
-
----
-
-## Licença
-
-Distribuído sob a licença **MIT**. Veja o arquivo [LICENSE](LICENSE).
 
 <div align="center">
 
