@@ -144,8 +144,6 @@ python app.py
 
 </details>
 
-> [!WARNING]
-> Nunca envie `firmware/segredos.py` (senha do Wi-Fi) nem arquivos `.db` para o GitHub. O `.gitignore` já bloqueia os dois.
 
 ---
 
@@ -246,12 +244,12 @@ A pasta [`dashboard/`](dashboard) (HTML, CSS e JavaScript puro, sem bibliotecas)
 
 **TechGirls**
 
-| Nome | Função |
-|---|---|
-| Amanda Santos | [função] |
-| Camilla Sant'Anna | [função] |
-| Isabeli Vieira | [função] |
-| Anayza Rocha | [função] |
+| Nome | 
+|---|
+| Amanda Santos | 
+| Camilla Sant'Anna | 
+| Isabeli Vieira | 
+| Anayza Rocha | 
 
 ---
 
