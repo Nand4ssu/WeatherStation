@@ -1,4 +1,4 @@
-> **Vídeo de demonstração:** [assista aqui](https://drive.google.com/file/d/1souVceRCY1OWxy5DIvLBarkJM49f97L3/view?usp=sharing)
+> **Vídeo de demonstração e apresentação:** [assista aqui](https://drive.google.com/file/d/1souVceRCY1OWxy5DIvLBarkJM49f97L3/view?usp=sharing)
 
 <div align="center">
 
