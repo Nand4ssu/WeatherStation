@@ -59,7 +59,7 @@ flowchart LR
 1. O **ESP32** lê os sensores a cada intervalo e envia um JSON pelo Wi-Fi, usando o protocolo MQTT.
 2. O **backend em Python** recebe a mensagem, descarta valores impossíveis ou fora da curva e grava no banco.
 3. O **dashboard** mostra os valores ao vivo, o histórico, os alertas e a localização da estação.
-
+<br> <br> <br> 
 ### O DashBoard
 
 <p align="center">
