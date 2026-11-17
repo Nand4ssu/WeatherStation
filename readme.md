@@ -66,7 +66,7 @@ flowchart LR
   <img src="ImagesREAD/imagens/fullsite.jpeg" width="820" alt="Site inteiro como se encontra.">
 </p>
 
-
+<br><br><br>
 
 
 ## Hardware
